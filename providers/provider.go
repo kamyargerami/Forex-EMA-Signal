@@ -12,7 +12,12 @@ type provider interface {
 	GetValues()
 }
 
-type finalResult map[string]float64
+type finalResult []resultItem
+
+type resultItem struct {
+	date  string
+	Value float64
+}
 
 func request(url string) map[string]interface{} {
 	response, err := http.Get(url)
