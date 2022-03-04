@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
+	"time"
 )
 
 type Telegram struct{}
@@ -17,7 +19,9 @@ func (service Telegram) Send(text string) map[string]interface{} {
 		"chat_id": helpers.Env("TELEGRAM_CHAT_ID"),
 	})
 
-	response, err := http.Post("https://api.telegram.org/bot"+helpers.Env("TELEGRAM_BOT_TOKEN")+"/sendMessage", "application/json", bytes.NewBuffer(postBody))
+	client := getClient()
+
+	response, err := client.Post("https://api.telegram.org/bot"+helpers.Env("TELEGRAM_BOT_TOKEN")+"/sendMessage", "application/json", bytes.NewBuffer(postBody))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -39,4 +43,21 @@ func (service Telegram) Send(text string) map[string]interface{} {
 	json.Unmarshal([]byte(bodyString), &jsonResult)
 
 	return jsonResult
+}
+
+func getClient() http.Client {
+	proxyUrl, err := url.Parse(helpers.Env("HTTP_PROXY"))
+
+	if err != nil {
+		return http.Client{
+			Timeout: 5 * time.Second,
+		}
+	}
+
+	return http.Client{
+		Timeout: 5 * time.Second,
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxyUrl),
+		},
+	}
 }
