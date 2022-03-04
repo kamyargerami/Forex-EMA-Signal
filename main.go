@@ -31,10 +31,10 @@ func main() {
 			}
 		}
 
-		if sell != 0 && sell <= 2 {
+		if sell != 0 && sell <= 3 {
 			fmt.Println(symbol, sell, buy, "Sell Signal")
 			services.Telegram{}.Send("Sell " + symbol)
-		} else if buy != 0 && buy <= 2 {
+		} else if buy != 0 && buy <= 3 {
 			fmt.Println(symbol, sell, buy, "Buy Signal")
 			services.Telegram{}.Send("Buy " + symbol)
 		} else {
